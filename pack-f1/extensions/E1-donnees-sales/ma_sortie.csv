@@ -1,0 +1,51 @@
+course;pilote;ecurie;position;temps_tour
+Bahrein;VERSTAPPEN;Red Bull;1;93.614
+Bahrein;LECLERC;Ferrari;2;93.637
+Bahrein;SAINZ;Ferrari;3;94.507
+Bahrein;NORRIS;McLaren;4;92.614
+Bahrein;RUSSELL;Mercedes;5;92.916
+Bahrein;PIASTRI;McLaren;6;93.860
+Bahrein;ALONSO;Aston Martin;7;93.749
+Bahrein;PEREZ;Red Bull;8;94.316
+Bahrein;STROLL;Aston Martin;9;93.727
+Bahrein;HAMILTON;Mercedes;0;
+Djeddah;LECLERC;Ferrari;1;96.112
+Djeddah;VERSTAPPEN;Red Bull;2;96.069
+Djeddah;NORRIS;McLaren;3;95.658
+Djeddah;HAMILTON;Mercedes;4;94.791
+Djeddah;PEREZ;Red Bull;5;95.727
+Djeddah;ALONSO;Aston Martin;6;94.468
+Djeddah;PIASTRI;McLaren;7;96.234
+Djeddah;RUSSELL;Mercedes;8;95.316
+Djeddah;SAINZ;Ferrari;9;96.229
+Djeddah;STROLL;Aston Martin;10;95.905
+Melbourne;NORRIS;McLaren;1;94.564
+Melbourne;VERSTAPPEN;Red Bull;2;94.667
+Melbourne;HAMILTON;Mercedes;3;96.488
+Melbourne;LECLERC;Ferrari;4;96.361
+Melbourne;PIASTRI;McLaren;5;96.051
+Melbourne;SAINZ;Ferrari;6;96.537
+Melbourne;STROLL;Aston Martin;7;95.322
+Melbourne;RUSSELL;Mercedes;8;94.229
+Melbourne;PEREZ;Red Bull;0;
+Melbourne;ALONSO;Aston Martin;0;
+Suzuka;VERSTAPPEN;Red Bull;1;94.415
+Suzuka;PEREZ;Red Bull;2;93.751
+Suzuka;LECLERC;Ferrari;3;94.165
+Suzuka;RUSSELL;Mercedes;4;95.212
+Suzuka;NORRIS;McLaren;5;94.781
+Suzuka;ALONSO;Aston Martin;6;94.465
+Suzuka;HAMILTON;Mercedes;7;93.083
+Suzuka;SAINZ;Ferrari;8;94.798
+Suzuka;PIASTRI;McLaren;9;93.930
+Suzuka;STROLL;Aston Martin;10;94.077
+Miami;LECLERC;Ferrari;1;94.661
+Miami;NORRIS;McLaren;2;94.442
+Miami;VERSTAPPEN;Red Bull;3;93.487
+Miami;PIASTRI;McLaren;4;94.462
+Miami;SAINZ;Ferrari;5;95.072
+Miami;HAMILTON;Mercedes;6;94.697
+Miami;PEREZ;Red Bull;7;94.424
+Miami;STROLL;Aston Martin;8;95.488
+Miami;ALONSO;Aston Martin;9;93.843
+Miami;RUSSELL;Mercedes;0;
