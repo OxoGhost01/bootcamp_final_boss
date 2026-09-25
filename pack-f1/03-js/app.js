@@ -10,7 +10,10 @@
 //    DÉCROISSANTS. La liste reçue ne doit pas être modifiée.
 //    À points égaux, celui qui a le plus de victoires passe devant.
 function trierParPoints(liste) {
-  // À COMPLÉTER
+  const copy = liste.toSorted(function(a, b) {
+    return b.points - a.points || b.victoires - a.victoires;
+  });
+  return copy;
 }
 
 // 2. remplirTableau(idCorps, liste) : remplit le <tbody> dont l'id est fourni.
@@ -18,13 +21,24 @@ function trierParPoints(liste) {
 //      rang (1, 2, 3...) | nom | écurie (chaîne vide si absente) | points | victoires
 //    Chaque <tr> porte l'attribut data-nom. Un nouvel appel REMPLACE le contenu.
 function remplirTableau(idCorps, liste) {
-  // À COMPLÉTER
+  const corps = document.getElementById(idCorps);
+  corps.innerHTML = "";
+  for (const [i, entree] of liste.entries()) {
+    const ligne = document.createElement("tr");
+    ligne.setAttribute("data-nom", entree.nom);
+    ligne.innerHTML = `<td>${i + 1}</td><td>${entree.nom}</td><td>${entree.ecurie ?? ""}</td><td>${entree.points}</td><td>${entree.victoires}</td>`;
+    corps.appendChild(ligne);
+  }
 }
 
 // 3. marquerPodium(idCorps) : ajoute la classe CSS "podium" aux TROIS PREMIÈRES
 //    lignes du tableau, et la retire de toutes les autres.
 function marquerPodium(idCorps) {
-  // À COMPLÉTER
+  const corps = document.getElementById(idCorps);
+  const prems = corps.querySelectorAll("tr:nth-child(-n+3)");
+  for (const tr of prems) {
+    tr.classList.add("podium");
+  }
 }
 
 /* --- FOURNI — NE PAS MODIFIER : affichage de la saison ------------------- */
