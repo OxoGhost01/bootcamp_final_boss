@@ -61,6 +61,8 @@ The sort order is defined once in a shared `Comparator` (`ORDRE`), which both st
 ## Running
 
 ```sh
+# require running on a Linux system with basic packages and tools (for example Kira Linux xD)
+
 ./runall # basic script
 ./runallbutbeautiful # animated version by Claude
 ```
