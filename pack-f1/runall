@@ -1,0 +1,31 @@
+#!/bin/bash
+
+echo "Welcome to the amazing world of all test passing (for once)"
+
+echo "--- Python ---"
+cd 01-python
+python3 same_but_better.py
+
+echo "--- Java ---"
+cd ../02-java
+javac -encoding UTF-8 -d out src/*.java
+echo "Tests"
+java -Dstdout.encoding=UTF-8 -cp out Tests
+echo "Tests E2"
+java -Dstdout.encoding=UTF-8 -cp out TestsE2
+echo "Main"
+java -Dstdout.encoding=UTF-8 -cp out Main
+
+echo "Waiting a bit for you to admire the first part passing well"
+sleep 5
+
+echo "--- JavaScript ---"
+cd ../03-js
+xdg-open index.html
+
+echo ""
+echo ""
+echo "Yeah i know it's beautiful, all tests passed x)"
+echo "thx for watching, don't forget to put some stars on my github :)"
+echo ""
+echo "Made with ❤️ by @oxoghost, on Kira Linux"

@@ -1,0 +1,201 @@
+#!/bin/bash
+
+cd "$(dirname "$0")" || exit 1
+
+if [ -t 1 ] && [ -z "$NO_COLOR" ]; then
+    RESET=$'\e[0m'; BOLD=$'\e[1m'; DIM=$'\e[2m'; ITALIC=$'\e[3m'
+    RED=$'\e[38;5;196m'; GREEN=$'\e[38;5;46m'; YELLOW=$'\e[38;5;220m'
+    BLUE=$'\e[38;5;39m'; ORANGE=$'\e[38;5;208m'; GREY=$'\e[38;5;244m'
+    PY=$'\e[38;5;226m'; JAVA=$'\e[38;5;202m'; JS=$'\e[38;5;227m'
+    ANIM=1
+else
+    RESET=; BOLD=; DIM=; ITALIC=; RED=; GREEN=; YELLOW=; BLUE=; ORANGE=; GREY=; PY=; JAVA=; JS=
+    ANIM=0
+fi
+
+WIDTH=$(tput cols 2>/dev/null || echo 80)
+[ "$WIDTH" -gt 90 ] && WIDTH=90
+LOG=$(mktemp)
+STEPS=()
+FAILED=0
+
+cleanup() { tput cnorm 2>/dev/null; rm -f "$LOG"; }
+trap cleanup EXIT
+trap 'echo; exit 130' INT
+[ "$ANIM" = 1 ] && tput civis 2>/dev/null
+
+repeat() {
+    local s
+    printf -v s '%*s' "$2" ''
+    printf '%s' "${s// /$1}"
+}
+
+rainbow() {
+    if [ -z "$RESET" ]; then echo "$1"; return; fi
+    local text="$1" colors=(196 208 220 46 39 93 201) i
+    for ((i = 0; i < ${#text}; i++)); do
+        printf '\e[38;5;%sm%s' "${colors[i % ${#colors[@]}]}" "${text:i:1}"
+    done
+    printf '%s\n' "$RESET"
+}
+
+typewriter() {
+    local text="$1" i
+    if [ "$ANIM" = 0 ]; then echo "$text"; return; fi
+    for ((i = 0; i < ${#text}; i++)); do
+        printf '%s' "${text:i:1}"
+        sleep 0.02
+    done
+    echo
+}
+
+line() { printf '%s%s%s\n' "$GREY" "$(repeat ─ "$WIDTH")" "$RESET"; }
+
+banner() {
+    local art=(
+        "  ███████╗ ██╗     ██████╗ ██╗██████╗ ███████╗██╗     ██╗███╗   ██╗███████╗"
+        "  ██╔════╝███║     ██╔══██╗██║██╔══██╗██╔════╝██║     ██║████╗  ██║██╔════╝"
+        "  █████╗  ╚██║     ██████╔╝██║██████╔╝█████╗  ██║     ██║██╔██╗ ██║█████╗  "
+        "  ██╔══╝   ██║     ██╔═══╝ ██║██╔═══╝ ██╔══╝  ██║     ██║██║╚██╗██║██╔══╝  "
+        "  ██║      ██║     ██║     ██║██║     ███████╗███████╗██║██║ ╚████║███████╗"
+        "  ╚═╝      ╚═╝     ╚═╝     ╚═╝╚═╝     ╚══════╝╚══════╝╚═╝╚═╝  ╚═══╝╚══════╝"
+    )
+    local colors=(196 202 208 214 220 226) i
+    echo
+    for i in "${!art[@]}"; do
+        printf '\e[1;38;5;%sm%s%s\n' "${colors[i]}" "${art[i]}" "$RESET"
+        [ "$ANIM" = 1 ] && sleep 0.05
+    done
+    echo
+}
+
+race() {
+    [ "$ANIM" = 0 ] && return
+    local car="🏎️💨" track=$((WIDTH - 6)) x
+    for ((x = 0; x <= track; x += 2)); do
+        printf '\r%s%*s%s%s' "$DIM" "$x" '' "$RESET" "$car"
+        sleep 0.012
+    done
+    printf '\r%*s\r' "$WIDTH" ''
+    printf '%s🏁 %sLights out and away we go!%s\n\n' "$RESET" "$BOLD$YELLOW" "$RESET"
+}
+
+lights() {
+    [ "$ANIM" = 0 ] && return
+    local i j
+    for i in 1 2 3 4 5; do
+        printf '\r  '
+        for ((j = 1; j <= 5; j++)); do
+            if [ "$j" -le "$i" ]; then printf '%s●%s ' "$RED" "$RESET"; else printf '%s○%s ' "$GREY" "$RESET"; fi
+        done
+        sleep 0.35
+    done
+    sleep 0.5
+    printf '\r  %s○ ○ ○ ○ ○%s\n' "$GREY" "$RESET"
+}
+
+section() {
+    local color="$1" icon="$2" title="$3"
+    echo
+    printf '%s%s╭%s╮%s\n' "$BOLD" "$color" "$(repeat ─ $((WIDTH - 2)))" "$RESET"
+    printf '%s%s│ %s  %-*s│%s\n' "$BOLD" "$color" "$icon" $((WIDTH - 7)) "$title" "$RESET"
+    printf '%s%s╰%s╯%s\n' "$BOLD" "$color" "$(repeat ─ $((WIDTH - 2)))" "$RESET"
+}
+
+colorize() {
+    while IFS= read -r l; do
+        case "$l" in
+            *❌*|*Exception*|*error:*|*Error*) printf '   %s%s%s\n' "$RED" "$l" "$RESET" ;;
+            *✅*) printf '   %s%s%s\n' "$GREEN" "$l" "$RESET" ;;
+            *"tests réussis"*) printf '   %s%s%s\n' "$BOLD$YELLOW" "$l" "$RESET" ;;
+            *) printf '   %s%s%s\n' "$GREY" "$l" "$RESET" ;;
+        esac
+    done
+}
+
+step() {
+    local label="$1"; shift
+    local frames=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏) i=0 start=$SECONDS status
+    "$@" >"$LOG" 2>&1 &
+    local pid=$!
+    if [ "$ANIM" = 1 ]; then
+        while kill -0 "$pid" 2>/dev/null; do
+            printf '\r  %s%s%s %s %s(%ss)%s' "$BLUE" "${frames[i++ % 10]}" "$RESET" "$label" "$DIM" $((SECONDS - start)) "$RESET"
+            sleep 0.08
+        done
+    fi
+    wait "$pid"; status=$?
+    grep -q '❌' "$LOG" && status=1
+    local took=$((SECONDS - start))
+    if [ "$status" = 0 ]; then
+        printf '\r  %s✔%s %s %s(%ss)%s\e[K\n' "$GREEN$BOLD" "$RESET" "$label" "$DIM" "$took" "$RESET"
+        STEPS+=("${GREEN}✔${RESET}|$label|${took}s")
+    else
+        printf '\r  %s✘%s %s %s(%ss)%s\e[K\n' "$RED$BOLD" "$RESET" "$label" "$DIM" "$took" "$RESET"
+        STEPS+=("${RED}✘${RESET}|$label|${took}s")
+        FAILED=$((FAILED + 1))
+    fi
+    colorize <"$LOG"
+    echo
+}
+
+countdown() {
+    local total="$1" i bar
+    if [ "$ANIM" = 0 ]; then sleep "$total"; return; fi
+    for ((i = total; i > 0; i--)); do
+        bar=$(repeat █ $(((total - i + 1) * 30 / total)))
+        printf '\r  %s%s%-30s%s %s%ss%s ' "$ITALIC" "$ORANGE" "$bar" "$RESET" "$DIM" "$i" "$RESET"
+        sleep 1
+    done
+    printf '\r%*s\r' "$WIDTH" ''
+}
+
+summary() {
+    local s icon label took
+    echo
+    printf '  %s%s🏆 RACE CLASSIFICATION%s\n' "$BOLD" "$YELLOW" "$RESET"
+    line
+    for s in "${STEPS[@]}"; do
+        IFS='|' read -r icon label took <<<"$s"
+        printf '   %s  %-40s %s%6s%s\n' "$icon" "$label" "$DIM" "$took" "$RESET"
+    done
+    line
+}
+
+[ "$ANIM" = 1 ] && clear
+banner
+typewriter "  ${BOLD}Welcome to the amazing world of all test passing ${ITALIC}(for once)${RESET}"
+echo
+lights
+race
+
+section "$PY" "🐍" "PYTHON — ingestion"
+cd 01-python || exit 1
+step "Python tests + clean CSV" python3 same_but_better.py
+
+section "$JAVA" "☕" "JAVA — standings engine"
+cd ../02-java || exit 1
+step "Compiling" javac -encoding UTF-8 -d out src/*.java
+step "Tests" java -Dstdout.encoding=UTF-8 -cp out Tests
+step "Tests E2 (fastest lap)" java -Dstdout.encoding=UTF-8 -cp out TestsE2
+step "Main (writes donnees.js)" java -Dstdout.encoding=UTF-8 -cp out Main
+
+printf '  %sWaiting a bit for you to admire the first part passing well%s\n' "$ITALIC$GREY" "$RESET"
+countdown 5
+
+section "$JS" "🌐" "JAVASCRIPT — web page"
+cd ../03-js || exit 1
+step "Opening index.html in your browser" xdg-open index.html
+
+summary
+echo
+if [ "$FAILED" = 0 ]; then
+    typewriter "  ${BOLD}${GREEN}Yeah i know it's beautiful, all tests passed x)${RESET}"
+    typewriter "  thx for watching, don't forget to put some stars on my github :)"
+else
+    typewriter "  ${BOLD}${RED}Box box box! $FAILED step(s) failed, check the red lines above.${RESET}"
+fi
+echo
+printf '  '; rainbow "Made with ❤️ by @oxoghost, on Kira Linux"
+echo
+exit "$FAILED"
