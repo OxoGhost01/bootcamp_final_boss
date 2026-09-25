@@ -80,4 +80,35 @@ public class Classement {
         }
         return nombre == 0 ? 0 : Math.round(somme / nombre * 100) / 100.0;
     }
+
+    // E2. Renvoie le nom du pilote ayant signé le meilleur tour de cette course
+    // (le temps le plus PETIT, abandons compris), ou null si la course n'existe pas
+    // ou si aucun temps n'a été relevé. Un temps absent vaut -1.
+    public static String auteurMeilleurTour(List<Ligne> lignes, String course) {
+        String auteur = null;
+        double meilleur = Double.MAX_VALUE;
+        for (Ligne ligne : lignes) {
+            if (ligne.course().equals(course) && ligne.tempsTour() >= 0 && ligne.tempsTour() < meilleur) {
+                meilleur = ligne.tempsTour();
+                auteur = ligne.pilote();
+            }
+        }
+        return auteur;
+    }
+
+    // E2.2Comme classementPilotes, mais en ajoutant le point du meilleur tour
+    // quand son auteur est classé entre la 1re et la 10e place.
+    public static List<Resultat> classementAvecMeilleurTour(List<Ligne> lignes) {
+        Map<String, Resultat> pilotes = new HashMap<>();
+        for (Resultat resultat : classementPilotes(lignes)) {
+            pilotes.put(resultat.nom, resultat);
+        }
+        for (Ligne ligne : lignes) {
+            if (ligne.pilote().equals(auteurMeilleurTour(lignes, ligne.course()))
+                    && ligne.position() >= 1 && ligne.position() <= 10) {
+                pilotes.get(ligne.pilote()).points++;
+            }
+        }
+        return pilotes.values().stream().sorted(ORDRE).toList();
+    }
 }
