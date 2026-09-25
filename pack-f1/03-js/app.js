@@ -51,3 +51,29 @@ function afficherSaison() {
   remplirTableau("corps-ecuries", trierParPoints(ECURIES));
   marquerPodium("corps-ecuries");
 }
+
+// 1. filtrerParEcurie(liste, ecurie) : renvoie une NOUVELLE liste ne contenant
+//    que les entrées de cette écurie. Une écurie vide ("") renvoie tout.
+//    La liste reçue n'est pas modifiée.
+function filtrerParEcurie(liste, ecurie) {
+  return ecurie === "" ? liste : liste.filter(e => e.ecurie === ecurie);
+}
+
+// 2. activerTri(idTable, liste) : rend les en-têtes du tableau cliquables.
+//    Chaque <th> porte un attribut data-colonne ("nom", "points" ou "victoires").
+//    Au clic, le <tbody> du tableau est réaffiché (avec remplirTableau) trié :
+//      - "points" et "victoires" : ordre DÉCROISSANT
+//      - "nom" : ordre alphabétique CROISSANT
+//    Le tri doit fonctionner à chaque clic, y compris après un réaffichage.
+function activerTri(idTable, liste) {
+  const table = document.getElementById(idTable);
+  const corps = table.querySelector("tbody");
+  table.querySelectorAll("th[data-colonne]").forEach(th => {
+    th.addEventListener("click", () => {
+      const colonne = th.dataset.colonne;
+      const triee = liste.toSorted((a, b) =>
+        colonne === "nom" ? a.nom.localeCompare(b.nom) : b[colonne] - a[colonne]);
+      remplirTableau(corps.id, triee);
+    });
+  });
+}
